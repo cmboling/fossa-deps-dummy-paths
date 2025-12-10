@@ -1,0 +1,27 @@
+name: FOSSA CLI Analysis
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fossa-scan:
+    runs-on: ubuntu-latest
+    env:
+      FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }}
+    steps:
+      # Checkout the repository
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      # Install FOSSA CLI
+      - name: Download FOSSA CLI
+        run: |
+          curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install-latest.sh | bash
+          fossa --version
+
+      # Loop over tags and scan each one
+      - name: Scan release tags
+        run: |
+
+          fossa analyze
+          fossa test
