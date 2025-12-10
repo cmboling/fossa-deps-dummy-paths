@@ -1,0 +1,12 @@
+referenced-dependencies:
+  - type: git
+    name: https://github.com/cilium/cilium
+    version: 1.18.4
+
+vendored-dependencies:
+- name: test-package
+  path: vendor/
+  version: 0.0.0
+  metadata:
+    description: This vendored lib is undergoing further licensing review.
+    
