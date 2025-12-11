@@ -26,7 +26,7 @@ jobs:
             --data '{
               "token": "'$JWT'",
               "providerId": 26,
-              "username": "chelsea-github-action-fossa-service-account",
+              "username": "chelsea-github-actions",
               "expiresIn": 3600,
               "isPushOnly": true
             }' \
