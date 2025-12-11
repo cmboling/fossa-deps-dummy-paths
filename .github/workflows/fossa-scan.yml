@@ -4,20 +4,38 @@ on:
   workflow_dispatch:
 
 jobs:
-  fossa-scan:
+  fossa-check:
     runs-on: ubuntu-latest
-    env:
-      FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }}
+    permissions:
+      id-token: write  # Required for OIDC
+      contents: read
     steps:
-      # Checkout the repository
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
-      # Install FOSSA CLI
-      - name: Download FOSSA CLI
+      - name: Get FOSSA Token via OIDC
+        run: |
+          # Get JWT from GitHub Actions
+          JWT=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=app.fossa.com" | jq -r '.value')
+
+          # Exchange JWT for FOSSA API token
+          FOSSA_API_KEY=$(curl --request POST \
+            --url https://app.fossa.com/api/oidc/token-exchange \
+            --header 'accept: application/json' \
+            --header 'content-type: application/json' \
+            --data '{
+              "token": "'$JWT'",
+              "providerId": 5,
+              "username": "github-oidc-service-account",
+              "expiresIn": 3600,
+              "isPushOnly": true
+            }' \
+            | jq -r '.credential.token')
+
+          echo "FOSSA_API_KEY=$FOSSA_API_KEY" >> "$GITHUB_ENV"
+
+      - name: Run FOSSA Analysis
         run: |
           curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install-latest.sh | bash
-          fossa --version
-
           fossa analyze
           fossa test
