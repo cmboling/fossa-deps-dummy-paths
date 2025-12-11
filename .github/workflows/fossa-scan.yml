@@ -25,8 +25,8 @@ jobs:
             --header 'content-type: application/json' \
             --data '{
               "token": "'$JWT'",
-              "providerId": 5,
-              "username": "github-oidc-service-account",
+              "providerId": 26,
+              "username": "chelsea-github-action-fossa-service-account",
               "expiresIn": 3600,
               "isPushOnly": true
             }' \
