@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Get FOSSA Token via OIDC
+      - name: FOSSA analysis
         run: |
           # Get JWT from GitHub Actions
           JWT=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
@@ -34,16 +34,6 @@ jobs:
 
           echo "FOSSA_API_KEY=$FOSSA_API_KEY" >> "$GITHUB_ENV"
 
-      - name: Confirm var is set
-        run: |
-          if [ -z "$FOSSA_API_KEY" ]; then
-            echo "Missing FOSSA_API_KEY" && exit 1
-          else
-            echo "FOSSA_API_KEY is present"
-          fi
-
-      - name: Run FOSSA Analysis
-        run: |
           curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install-latest.sh | bash
-          fossa analyze
+          fossa analyze --fossa-api-key $FOSSA_API_KEY
           fossa test
